@@ -1,6 +1,7 @@
 from src.read_data import read_claims_raw
 from src.spark_session import get_spark
 from src.deduplication import deduplicate_claims_latest
+from pyspark.sql import functions as F
 
 spark = get_spark()
 claims_df = read_claims_raw(
