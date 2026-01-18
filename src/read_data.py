@@ -16,5 +16,5 @@ claims_schema = StructType([
 
 def read_claims_raw(spark,base_path):
     return (
-        spark.read.schema(claims_schema).parquet("base_path")
+        spark.read.schema(claims_schema).parquet(base_path)
     )
