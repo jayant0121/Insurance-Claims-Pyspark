@@ -12,7 +12,7 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s"
 )
-logger = logging.getLogger("claims-pipeline")
+logger = logging.getLogger("dedup-pipeline")
 
 logger.info("Starting claims deduplication pipeline")
 
@@ -23,25 +23,13 @@ claims_df = read_claims_raw(
     "data/raw/claims_raw"
 )
 
-# Deduplicate
+# Deduplicate 
 logger.info("Deduplicating claims to get latest records")
 claims_latest = deduplicate_claims_latest(claims_df)
 
-# Lightweight validation (development only)
-logger.info("Schema after deduplication:")
-claims_latest.printSchema()
+logger.info("Writing latest claims dataset") 
 
-logger.info("Showing sample records")
-claims_latest.show(5, truncate=False)
+claims_latest.write.mode("overwrite").partitionBy("claim_date").parquet("data/processed/claims_latest") 
 
-latest_count = claims_latest.count()
-logger.info("Latest claims count: %d", latest_count)
-
-# Write output
-logger.info("Writing latest claims dataset")
-claims_latest.write \
-    .mode("overwrite") \
-    .partitionBy("claim_date") \
-    .parquet("data/processed/claims_latest")
-
-logger.info("Claims deduplication pipeline completed successfully")
+row_count = claims_latest.count()
+logger.info("Claims deduplication completed. Output row count: %d", row_count)
